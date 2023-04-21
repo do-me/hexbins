@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- load all packages -->
+
+    <link rel="apple-touch-icon" sizes="180x180" href="static/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="static/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="static/favicon/favicon-16x16.png">
+    <link rel="manifest" href="static/favicon/site.webmanifest">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="static/assets/leaflet/leaflet.css">
+    <script src="static/assets/leaflet/leaflet.js"></script>
+    <script src="static/assets/leaflet.ajax.min.js"></script>
+    <script src="static/assets/d3.min.js"></script>
+    <script src="static/assets/jquery.min.js"></script>
+    <link rel="stylesheet" href="static/assets/control_geocoder/Control.Geocoder.css" />
+    <script src="static/assets/control_geocoder/Control.Geocoder.js"></script>
+    <link rel="stylesheet" href="static/assets/leaflet_measure/Leaflet.PolylineMeasure.css" />
+    <script src="static/assets/leaflet_measure/Leaflet.PolylineMeasure.js"></script>
+    <link rel="stylesheet" href="static/assets/visual_click/L.VisualClick.css" />
+    <script src="static/assets/visual_click/L.VisualClick.js"></script>
+    <script src="static/assets/d3-hexbin.v0.2.min.js"></script>
+    <script src="static/assets/leaflet-d3.js" charset="utf-8"></script>
+    <script src="static/assets/popper.min.js" charset="utf-8"></script>
+    <script src="static/assets/leaflet_fullscreen/leaflet.fullscreen.min.js"></script>
+    <link href="static/assets/leaflet_fullscreen/leaflet.fullscreen.css" rel="stylesheet" />
+    <link rel="stylesheet" href="static/assets/main.css" />
+    <script src="static/assets/main.js"></script>
+    <link rel="stylesheet" href="static/assets/font-awesome/css/all.css" />
+    <link rel="stylesheet" href="static/assets/BigImage/Leaflet.BigImage.min.css">
+    <script src="static/assets/BigImage/Leaflet.BigImage.min.js"></script>
+    <script src="static/assets/papaparse.min.js"></script>
+    <script src="static/assets/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="static/assets/bootstrap/bootstrap.min.css"  />
+    <link rel="stylesheet" href="static/assets/font-awesome/all.min.css" />
+
+    <script src="static/assets/d3.v5.min.js" charset="utf-8"></script>
+    <script src="static/assets/d3-hexbin.v0.2.min.js"></script>
+    <script src="static/assets/leaflet-d3.js" charset="utf-8"></script>
+    <script src="static/assets/simple-statistics-7-8-3.min.js" charset="utf-8"></script>
+    <script data-goatcounter="https://georocks.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    <title>An application-oriented implementation of hexagonal on-the-fly binning metrics for city-scale georeferenced social media data</title>
+
+</head>
+
+<body>
+    <script src="static/assets/bootstrap/bootstrap.bundle.min.js"></script>
+    <div id="map">
+        <div id="spinner" hidden></div> 
+    </div>
+
+    <button id="toggle_sidebar_button" class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling"
+        aria-controls="offcanvasScrolling"><i class="fa fa-chevron-right fa-xl"></i></button>
+
+    <div class="offcanvas offcanvas-start show" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1"
+        id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel" data-bs-theme="dark">
+        <div class="offcanvas-header">
+            <h4 class="offcanvas-title" id="offcanvasScrollingLabel">Hexbin Visualizations</h4>
+            
+            <!--<a href="https://geo.rocks/social-media-dashboard/" title="Handbuch" style="color: unset"><i class="fa fa-book"></i></a>-->
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <details>
+                <summary>Paper & Authors</summary>
+                <p>Demo app for the FOSS4G paper: <a href="https://talks.osgeo.org/foss4g-2023-academic-track/talk/review/LYAPC8RN3WGQTBAPXQSADB3WFQM3JLSU">An application-oriented implementation of hexagonal on-the-fly binning metrics for city-scale georeferenced social media data</a></p>
+                <p>Authors: <a href="https://geo.rocks/about/">Dominik Weckmüller</a>, <a href="https://www.alexanderdunkel.com/">Alexander Dunkel</a>.</p>
+                <p><a href="https://github.com/do-me/hexbins">GitHub</a></p>
+            </details>
+            <br>
+            <h5><label for="topic" data-toggle="tooltip" title="Select a topic. These terms (and their German variations) were identified in the posts.">Topic</label></h5>
+            <select class="form-select" aria-label="Default select example" id="topic">
+              <option value="basketball">🏀 Basketball</option>
+              <option value="beethoven">🎼 Beethoven</option>
+              <option value="fridaysforfuture">🌍 Fridays for Future</option>
+              <option value="garbage">🗑️ Garbage</option>
+              <option value="hotel">🏨 Hotel</option>
+              <option value="italian">🍝 Italian</option>
+              <option value="kirschbluete">🌸 Cherry Blossoms</option>
+              <option value="natur">🌳 Nature</option>
+              <option value="restaurant">🍴 Restaurants</option>
+              <option value="soccer">⚽ Soccer</option>
+              <option value="tischtennis">🏓 Table Tennis</option>
+              <option value="volleyball">🏐 Volleyball</option>
+              <option value="all">🌟 All Posts</option>
+            </select>
+            <br>
+            <h5><label for="vizmode" data-toggle="tooltip" title="Toggle between different visualization modes.">Visualization Mode</label></h5>
+            <select class="form-select" aria-label="Default select example" id="vizmode">
+              <option value="posts_hex_abs">Absolute</option>
+              <option value="posts_hex_rel">Relative (Pureness)</option>
+              <option value="posts_hex_chi">Signed Chi (X Statistical Significance)</option>
+            </select>
+            <br>
+
+            <div id="breakModeContainer" style="display: none;">
+                <h5><label for="breakMode" data-toggle="tooltip" title="Color Breakpoints">Color Breakpoints</label></h5>
+                <select class="form-select" aria-label="Default select example" id="breakMode">
+                <option value="equal_breaks">Equal Breaks</option>
+                <option value="jenks_natural_breaks">Jenks Natural Breaks</option>
+                <option value="quantile">Quantiles</option>
+                <option value="head_tail_breaks">Head-Tail-Breaks</option>
+                <!--<option value="standard_deviation">Standard Deviation</option>
+                <option value="z_score">Z-Score</option> these could be implemented in the future-->
+                </select>
+                <br>
+            </div>
+
+            <div id="chiRelColorsContainer" style="display: none;">
+                <h5><label for="chiRelColors" data-toggle="tooltip" title="Toggle between normal color calculation where all locations in the hexbin are taken into account (default) or colors based on the values of the best location in the hexbin only. The latter is useful for consistent colors over all zooming levels. ">Color Scale</label></h5>
+                <div id="chiRelColors">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="colorScaleRadio" id="chiRelNormal" value="normalMode" checked>
+                        <label class="form-check-label" for="chiRelNormal">
+                            Normal calculation 
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="colorScaleRadio" id="chiRelBestLoc" value="bestLocMode">
+                        <label class="form-check-label" for="chiRelBestLoc">
+                            Best location only
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="radiusSettings">
+                <h5><label for="radiusRadioButtons" data-toggle="tooltip" title="Toggle between a fixed radius (default) and a radius size growing with the absolute number topic posts in the hexbin." >Radius</label></h5>
+                <div id="radiusRadioButtons">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="radiusRadio" id="fixedRadius" value="fixedRadius" checked>
+                        <label class="form-check-label" for="fixedRadius">
+                            Fixed
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="radiusRadio" id="postsMatchRadius" value="postsMatchRadius">
+                        <label class="form-check-label" for="postsMatchRadius">
+                            Topic Posts
+                        </label>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div id="marginContainer" style="display: none;">
+                <div class="d-flex">
+                    <h5><label for="margin" class="d-inline-block" data-toggle="tooltip" title="Overall mean +- this margin. Move the slider to the right to see more extreme posts that are much above average (green) or much below (red).">Margin</label></h5>
+                </div>
+                    <input type="number" class="form-control" id="margin" min="0" max="1" step="0.01" value="0">
+                <input type="range" class="form-control-range" id="marginRange" min="0" max="1" step="0.01" value="0">
+                
+                <div class="d-flex"><div style="background-color: #FF4D4D;color: white;margin-right: 5px;">Red</div> = less than <div class="d-inline-block currentMean"></div>- margin</div>
+                <div class="d-flex"><div style="background-color: #00FF00;color: black;margin-right: 5px;">Green</div> = greater than <div class="d-inline-block currentMean"></div>+ margin</div>
+                <br>
+            </div>
+            <h5><label data-toggle="tooltip" title="Instagram Locations in last-hovered hexbin">Instagram Locations</label></h5>
+            <div id="locations"></div>
+
+              
+        </div>
+    </div>
+</body>
+
+</html>
