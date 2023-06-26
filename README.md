@@ -1,8 +1,9 @@
 # Hexbin Visualizations for Social Media Posts
 
 ## Info
-Demo app for the FOSS4G 2023 paper: [An application-oriented implementation of hexagonal on-the-fly binning metrics for city-scale georeferenced social media data](https://talks.osgeo.org/foss4g-2023-academic-track/talk/review/LYAPC8RN3WGQTBAPXQSADB3WFQM3JLSU)
+Demo app for the FOSS4G 2023 paper: [An application-oriented implementation of hexagonal on-the-fly binning metrics for city-scale georeferenced social media data](https://isprs-archives.copernicus.org/articles/XLVIII-4-W7-2023/253/2023/).
 
+- Talk: https://talks.osgeo.org/foss4g-2023-academic-track/talk/review/LYAPC8RN3WGQTBAPXQSADB3WFQM3JLSU
 - App: https://geo.rocks/hexbins/
 - Data: publicly available Instagram data from 2011-2022 (September). 
 - Privacy: The dumps under `data` are grouped by Instagram locations. No individual persons or posts can be tracked as HyperLogLog has been used to create thematic sets when mining the data. More info in the paper.
